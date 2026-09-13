@@ -1,0 +1,38 @@
+---
+description: UX 상태 UI와 한글 오류 처리 (로딩/빈/오류)
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# UX · 오류 처리
+
+기능 추가 시 로딩 / 빈 상태 / 오류 UI를 모두 제공하고, 상호작용 지연을 최소화한다.
+
+- 서버·클라이언트 모두 예외를 포착한다.
+- 사용자에게는 **한글** 친절 메시지만 노출한다.
+- 개발 환경에서는 `console.error` 등으로 상세 로그를 남긴다.
+- 주요 액션은 낙관적 UI 또는 disabled + 로딩으로 즉시 피드백한다.
+
+```tsx
+// ❌ BAD
+try {
+  await saveTodo(payload);
+} catch (e) {}
+
+// ✅ GOOD
+try {
+  await saveTodo(payload);
+} catch (error) {
+  if (process.env.NODE_ENV === "development") {
+    console.error("[saveTodo]", error);
+  }
+  toast.error("할 일을 저장하지 못했어요. 잠시 후 다시 시도해 주세요.");
+}
+```
+
+## 체크리스트
+
+- [ ] 로딩 스켈레톤/스피너
+- [ ] 빈 상태 안내
+- [ ] 오류 상태 + 한글 메시지
+- [ ] 액션 즉각 피드백

@@ -1,0 +1,17 @@
+---
+description: AI 할 일 관리 — 기술 스택과 환경 변수 규칙
+alwaysApply: true
+---
+
+# 기술 스택
+
+- Next.js **16** App Router를 따른다. (`node_modules/next/dist/docs/` 참고)
+- TypeScript 필수 (`strict` 권장), Tailwind CSS, shadcn/ui, ESLint(Next/TS)
+- AI: AI SDK (`ai`, `@ai-sdk/*`) — 이미 사용 중
+- 백엔드/인증: Supabase (Auth/DB) — **도입 예정**. 추가 전까지 임의 백엔드 라이브러리를 넣지 않는다.
+
+## 의존성·환경
+
+- 스택 외 라이브러리는 필요성이 분명할 때만 추가한다.
+- 시크릿·로컬 설정은 `.env.local`에 두고 커밋하지 않는다. (`.gitignore`의 `.env*` 유지)
+- 공개 값은 `NEXT_PUBLIC_` 접두사만 사용한다.
