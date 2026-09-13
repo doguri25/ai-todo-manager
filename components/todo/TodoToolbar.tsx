@@ -62,8 +62,25 @@ const ORDER_LABELS = Object.fromEntries(
   ORDER_ITEMS.map((item) => [item.value, item.label])
 ) as Record<TodoSortOrder, string>;
 
-const MENU_CONTENT_CLASS =
-  "min-w-0 w-(--anchor-width) max-w-(--anchor-width) rounded-t-none rounded-b-3xl border-t-0 shadow-md";
+/** 필터 버튼 — 열렸을 때 메뉴와 같은 톤으로 이어지게 */
+const FILTER_TRIGGER_CLASS =
+  "h-9 w-full border border-border/55 bg-input/55 text-sm text-foreground shadow-none " +
+  "hover:bg-input/70 focus-visible:border-border/55 focus-visible:ring-0 " +
+  "data-popup-open:rounded-b-none data-popup-open:border-border/55 " +
+  "data-popup-open:border-b-transparent data-popup-open:bg-input/55 " +
+  "data-popup-open:shadow-none data-popup-open:ring-0";
+
+/** 필터 메뉴 — 버튼 배경·테두리를 그대로 이어받음 */
+const FILTER_MENU_CLASS =
+  "min-w-0 w-(--anchor-width) max-w-(--anchor-width) rounded-t-none rounded-b-3xl " +
+  "border border-t-0 border-border/55 bg-input/55 p-1 text-popover-foreground " +
+  "shadow-none ring-0 outline-none " +
+  "data-open:animate-none data-closed:animate-none";
+
+const FILTER_ITEM_CLASS =
+  "rounded-2xl py-1.5 pr-3 text-foreground " +
+  "focus:bg-background/75 focus:text-foreground " +
+  "data-highlighted:bg-background/75 data-highlighted:text-foreground";
 
 type TodoToolbarProps = {
   query: string;
@@ -138,7 +155,7 @@ export const TodoToolbar = ({
           >
             <SelectTrigger
               id="todo-completion-filter"
-              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
+              className={FILTER_TRIGGER_CLASS}
             >
               <SelectValue />
             </SelectTrigger>
@@ -147,10 +164,14 @@ export const TodoToolbar = ({
               sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className={MENU_CONTENT_CLASS}
+              className={FILTER_MENU_CLASS}
             >
               {completionOptions.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+                <SelectItem
+                  key={item.value}
+                  value={item.value}
+                  className={FILTER_ITEM_CLASS}
+                >
                   {item.label}
                 </SelectItem>
               ))}
@@ -172,7 +193,7 @@ export const TodoToolbar = ({
           >
             <SelectTrigger
               id="todo-priority-filter"
-              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
+              className={FILTER_TRIGGER_CLASS}
             >
               <SelectValue />
             </SelectTrigger>
@@ -181,10 +202,14 @@ export const TodoToolbar = ({
               sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className={MENU_CONTENT_CLASS}
+              className={FILTER_MENU_CLASS}
             >
               {priorityOptions.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+                <SelectItem
+                  key={item.value}
+                  value={item.value}
+                  className={FILTER_ITEM_CLASS}
+                >
                   {item.label}
                 </SelectItem>
               ))}
@@ -204,10 +229,7 @@ export const TodoToolbar = ({
               onSortChange(value as TodoSortKey);
             }}
           >
-            <SelectTrigger
-              id="todo-sort"
-              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
-            >
+            <SelectTrigger id="todo-sort" className={FILTER_TRIGGER_CLASS}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent
@@ -215,10 +237,14 @@ export const TodoToolbar = ({
               sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className={MENU_CONTENT_CLASS}
+              className={FILTER_MENU_CLASS}
             >
               {sortOptions.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+                <SelectItem
+                  key={item.value}
+                  value={item.value}
+                  className={FILTER_ITEM_CLASS}
+                >
                   {item.label}
                 </SelectItem>
               ))}
@@ -238,10 +264,7 @@ export const TodoToolbar = ({
               onOrderChange(value as TodoSortOrder);
             }}
           >
-            <SelectTrigger
-              id="todo-order"
-              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
-            >
+            <SelectTrigger id="todo-order" className={FILTER_TRIGGER_CLASS}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent
@@ -249,10 +272,14 @@ export const TodoToolbar = ({
               sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className={MENU_CONTENT_CLASS}
+              className={FILTER_MENU_CLASS}
             >
               {orderOptions.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
+                <SelectItem
+                  key={item.value}
+                  value={item.value}
+                  className={FILTER_ITEM_CLASS}
+                >
                   {item.label}
                 </SelectItem>
               ))}
