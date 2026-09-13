@@ -57,10 +57,10 @@ export const TodoHeader = ({
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-tight sm:text-base">
-                AI Todo Manager
+                {APP_INFO.name}
               </p>
               <p className="hidden truncate text-xs text-muted-foreground lg:block">
-                개인 할 일과 AI 요약을 한곳에서
+                {APP_INFO.tagline}
               </p>
             </div>
           </DialogTrigger>

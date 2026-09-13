@@ -9,10 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { APP_INFO } from "@/lib/app/info";
 
 export const metadata: Metadata = {
-  title: "로그인 | AI Todo Manager",
-  description: "이메일과 비밀번호로 AI Todo Manager에 로그인합니다.",
+  title: "로그인",
+  description: `이메일과 비밀번호로 ${APP_INFO.name}에 로그인합니다.`,
 };
 
 /**
@@ -33,10 +34,10 @@ const LoginPage = () => {
           </div>
           <div className="space-y-2">
             <p className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              AI Todo Manager
+              {APP_INFO.name}
             </p>
             <p className="max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
-              자연어로 할 일을 만들고, 검색·필터로 정리하며, AI 요약으로 하루와
+              {APP_INFO.tagline}. 자연어로 할 일을 만들고 AI 요약으로 하루와
               한 주를 파악하세요.
             </p>
           </div>

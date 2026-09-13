@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { APP_INFO } from "@/lib/app/info";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
@@ -38,9 +39,53 @@ const gaegu = Gaegu({
   variable: "--font-gaegu",
 });
 
+const SITE_TITLE = "AI 할 일 관리 서비스";
+const SITE_DESCRIPTION = "AI가 도와주는 똑똑한 할 일 관리 서비스";
+
 export const metadata: Metadata = {
-  title: "AI Todo Manager",
-  description: "자연어로 할 일을 만들고 AI로 요약하는 할 일 관리 서비스",
+  metadataBase: new URL(APP_INFO.url),
+  title: {
+    default: SITE_TITLE,
+    template: `%s | ${APP_INFO.name}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: APP_INFO.name,
+  authors: [{ name: APP_INFO.author }],
+  creator: APP_INFO.author,
+  publisher: APP_INFO.organization,
+  keywords: [
+    "할 일",
+    "투두",
+    "AI",
+    "도구리 태스크",
+    "일정 관리",
+    "할 일 관리",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: APP_INFO.url,
+    siteName: APP_INFO.name,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
 };
 
 /**
