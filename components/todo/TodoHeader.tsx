@@ -1,10 +1,11 @@
 "use client";
 
-import { ListTodoIcon, MailIcon } from "lucide-react";
+import { ListTodoIcon, LogOutIcon, MailIcon } from "lucide-react";
 
 import { HeaderClockWeather } from "@/components/todo/HeaderClockWeather";
 import { UserSettingsMenu } from "@/components/theme/UserSettingsMenu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
 import { APP_INFO } from "@/lib/app/info";
 
 type TodoHeaderProps = {
@@ -27,7 +29,7 @@ type TodoHeaderProps = {
 };
 
 /**
- * 로고·날씨/날짜/시간·사용자(설정)를 고정 높이 헤더로 표시한다.
+ * 로고·날씨/날짜/시간·사용자(설정)·로그아웃을 고정 높이 헤더로 표시한다.
  */
 export const TodoHeader = ({
   displayName,
@@ -112,15 +114,35 @@ export const TodoHeader = ({
           <HeaderClockWeather scheduledDates={scheduledDates} />
         </div>
 
-        <div className="flex min-w-0 items-center justify-end">
+        <div className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2">
           {isAuthenticated ? (
-            <UserSettingsMenu
-              displayName={displayName}
-              email={email}
-              avatarUrl={avatarUrl}
-              isLoggingOut={isLoggingOut}
-              onLogout={onLogout}
-            />
+            <>
+              <UserSettingsMenu
+                displayName={displayName}
+                email={email}
+                avatarUrl={avatarUrl}
+                isLoggingOut={isLoggingOut}
+                onLogout={onLogout}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0 rounded-2xl"
+                disabled={isLoggingOut}
+                onClick={onLogout}
+                aria-label="로그아웃"
+              >
+                {isLoggingOut ? (
+                  <Spinner data-icon="inline-start" />
+                ) : (
+                  <LogOutIcon data-icon="inline-start" />
+                )}
+                <span className="hidden sm:inline">
+                  {isLoggingOut ? "로그아웃 중..." : "로그아웃"}
+                </span>
+              </Button>
+            </>
           ) : null}
         </div>
       </div>

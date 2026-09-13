@@ -2,15 +2,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { toAuthErrorMessage } from "@/lib/auth/messages";
 import { createClient } from "@/lib/supabase/client";
+
+const REMEMBER_EMAIL_KEY = "doguri-task-remember-email";
+const REMEMBER_ENABLED_KEY = "doguri-task-remember-enabled";
 
 type LoginFormState = {
   email: string;
@@ -26,9 +30,23 @@ export const LoginForm = () => {
     email: "",
     password: "",
   });
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<LoginFormState>>({});
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    try {
+      const enabled = localStorage.getItem(REMEMBER_ENABLED_KEY) === "1";
+      const savedEmail = localStorage.getItem(REMEMBER_EMAIL_KEY) ?? "";
+      setRememberEmail(enabled);
+      if (enabled && savedEmail) {
+        setValues((prev) => ({ ...prev, email: savedEmail }));
+      }
+    } catch {
+      // localStorage 사용 불가 시 무시
+    }
+  }, []);
 
   /**
    * 이메일·비밀번호 필수값과 형식을 검사한다.
@@ -51,6 +69,23 @@ export const LoginForm = () => {
     return errors;
   };
 
+  /**
+   * 아이디 저장 설정을 localStorage에 반영한다.
+   */
+  const persistRememberEmail = (email: string, enabled: boolean) => {
+    try {
+      if (enabled) {
+        localStorage.setItem(REMEMBER_ENABLED_KEY, "1");
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_ENABLED_KEY);
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+    } catch {
+      // localStorage 사용 불가 시 무시
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setAuthError(null);
@@ -61,9 +96,10 @@ export const LoginForm = () => {
 
     setIsSubmitting(true);
     try {
+      const email = values.email.trim();
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithPassword({
-        email: values.email.trim(),
+        email,
         password: values.password,
       });
 
@@ -80,6 +116,7 @@ export const LoginForm = () => {
         return;
       }
 
+      persistRememberEmail(email, rememberEmail);
       router.push("/");
       router.refresh();
     } catch (error) {
@@ -147,6 +184,17 @@ export const LoginForm = () => {
           <p className="text-sm text-destructive">{fieldErrors.password}</p>
         ) : null}
       </div>
+
+      <label className="flex items-center gap-2 text-sm">
+        <Checkbox
+          checked={rememberEmail}
+          disabled={isSubmitting}
+          onCheckedChange={(checked) => {
+            setRememberEmail(checked === true);
+          }}
+        />
+        아이디 저장
+      </label>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? <Spinner data-icon="inline-start" /> : null}

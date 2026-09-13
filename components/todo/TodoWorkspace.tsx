@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PlusIcon } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -83,6 +83,11 @@ export const TodoWorkspace = () => {
     signOut,
   } = useAuth();
 
+  const userId = user?.id;
+  const userEmail = user?.email ?? "";
+  const userDisplayName = user?.displayName ?? "";
+  const hasLoadedListRef = useRef(false);
+
   const [todos, setTodos] = useState<Todo[]>([]);
   const [scheduledDates, setScheduledDates] = useState<Date[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -119,7 +124,7 @@ export const TodoWorkspace = () => {
    * Supabase에서 현재 사용자의 할 일 목록을 불러온다.
    */
   const loadTodos = useCallback(async () => {
-    if (!user) {
+    if (!userId || !userEmail || !userDisplayName) {
       setTodos([]);
       setScheduledDates([]);
       setTotalCount(0);
@@ -127,14 +132,17 @@ export const TodoWorkspace = () => {
       return;
     }
 
-    setIsLoading(true);
+    const showSkeleton = !hasLoadedListRef.current;
+    if (showSkeleton) {
+      setIsLoading(true);
+    }
     setIsError(false);
     setListError(null);
 
     const profileResult = await ensureUserProfile({
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
+      id: userId,
+      email: userEmail,
+      displayName: userDisplayName,
     });
     if (profileResult.error) {
       setIsError(true);
@@ -144,7 +152,7 @@ export const TodoWorkspace = () => {
     }
 
     const result = await fetchTodos({
-      userId: user.id,
+      userId,
       query: debouncedQuery,
       completion,
       priority,
@@ -165,16 +173,30 @@ export const TodoWorkspace = () => {
 
     setTodos(result.data);
 
-    const countResult = await countTodos(user.id);
+    const countResult = await countTodos(userId);
     setTotalCount(countResult.data ?? result.data.length);
 
-    const scheduleResult = await fetchTodos({ userId: user.id });
+    const scheduleResult = await fetchTodos({ userId });
     if (scheduleResult.data) {
       setScheduledDates(toScheduledDates(scheduleResult.data));
     }
 
+    hasLoadedListRef.current = true;
     setIsLoading(false);
-  }, [user, debouncedQuery, completion, priority, sort, order]);
+  }, [
+    userId,
+    userEmail,
+    userDisplayName,
+    debouncedQuery,
+    completion,
+    priority,
+    sort,
+    order,
+  ]);
+
+  useEffect(() => {
+    hasLoadedListRef.current = false;
+  }, [userId]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -198,7 +220,7 @@ export const TodoWorkspace = () => {
    * 폼 제출로 할 일을 추가하거나 수정한 뒤 목록을 갱신한다.
    */
   const handleSubmit = async (values: TodoFormValues) => {
-    if (!user) {
+    if (!userId) {
       setActionError("로그인이 필요해요. 다시 로그인해 주세요.");
       return;
     }
@@ -208,9 +230,9 @@ export const TodoWorkspace = () => {
 
     try {
       const profileResult = await ensureUserProfile({
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
+        id: userId,
+        email: userEmail,
+        displayName: userDisplayName,
       });
       if (profileResult.error) {
         setActionError(profileResult.error);
@@ -219,7 +241,7 @@ export const TodoWorkspace = () => {
 
       const result = editingTodo
         ? await updateTodo(editingTodo.id, values)
-        : await createTodo(user.id, values);
+        : await createTodo(userId, values);
 
       if (result.error) {
         setActionError(result.error);

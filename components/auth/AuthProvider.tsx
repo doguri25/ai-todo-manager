@@ -70,7 +70,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const enriched = await enrichAuthUserInfo(sessionUser);
         if (mounted && token === syncToken) {
-          setUser(enriched);
+          setUser((prev) => {
+            if (
+              prev &&
+              prev.id === enriched.id &&
+              prev.email === enriched.email &&
+              prev.displayName === enriched.displayName &&
+              prev.avatarUrl === enriched.avatarUrl
+            ) {
+              return prev;
+            }
+            return enriched;
+          });
         }
       } catch (error) {
         if (process.env.NODE_ENV === "development") {
@@ -125,8 +136,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
+      // 탭 복귀 시 토큰 갱신만으로는 프로필·목록을 다시 불러오지 않는다.
+      if (event === "TOKEN_REFRESHED") return;
       void applySessionUser(session?.user ?? null).finally(() => {
         if (mounted) setIsLoading(false);
       });
