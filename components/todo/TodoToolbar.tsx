@@ -19,30 +19,51 @@ import type {
 import { PRIORITY_LABELS } from "@/lib/todos/status";
 import { TODO_PRIORITIES, type TodoPriority } from "@/lib/todos/types";
 
-const COMPLETION_ITEMS: Record<CompletionFilter, string> = {
-  all: "전체",
-  incomplete: "미완료",
-  completed: "완료",
-};
+const COMPLETION_ITEMS: { value: CompletionFilter; label: string }[] = [
+  { value: "all", label: "전체" },
+  { value: "incomplete", label: "미완료" },
+  { value: "completed", label: "완료" },
+];
 
-const PRIORITY_FILTER_ITEMS: Record<TodoPriority | "all", string> = {
-  all: "전체",
-  high: PRIORITY_LABELS.high,
-  medium: PRIORITY_LABELS.medium,
-  low: PRIORITY_LABELS.low,
-};
+const PRIORITY_FILTER_ITEMS: { value: TodoPriority | "all"; label: string }[] =
+  [
+    { value: "all", label: "전체" },
+    ...TODO_PRIORITIES.map((item) => ({
+      value: item,
+      label: PRIORITY_LABELS[item],
+    })),
+  ];
 
-const SORT_ITEMS: Record<TodoSortKey, string> = {
-  created_at: "생성일",
-  due_date: "마감일",
-  priority: "우선순위",
-  title: "제목",
-};
+const SORT_ITEMS: { value: TodoSortKey; label: string }[] = [
+  { value: "created_at", label: "생성일" },
+  { value: "due_date", label: "마감일" },
+  { value: "priority", label: "우선순위" },
+  { value: "title", label: "제목" },
+];
 
-const ORDER_ITEMS: Record<TodoSortOrder, string> = {
-  asc: "오름차순",
-  desc: "내림차순",
-};
+const ORDER_ITEMS: { value: TodoSortOrder; label: string }[] = [
+  { value: "asc", label: "오름차순" },
+  { value: "desc", label: "내림차순" },
+];
+
+const COMPLETION_LABELS = Object.fromEntries(
+  COMPLETION_ITEMS.map((item) => [item.value, item.label])
+) as Record<CompletionFilter, string>;
+
+const PRIORITY_FILTER_LABELS = Object.fromEntries(
+  PRIORITY_FILTER_ITEMS.map((item) => [item.value, item.label])
+) as Record<TodoPriority | "all", string>;
+
+const SORT_LABELS = Object.fromEntries(
+  SORT_ITEMS.map((item) => [item.value, item.label])
+) as Record<TodoSortKey, string>;
+
+const ORDER_LABELS = Object.fromEntries(
+  ORDER_ITEMS.map((item) => [item.value, item.label])
+) as Record<TodoSortOrder, string>;
+
+const MENU_CONTENT_CLASS =
+  "min-w-0 w-(--anchor-width) max-w-(--anchor-width) rounded-t-none rounded-b-3xl border-t-0 shadow-md";
 
 type TodoToolbarProps = {
   query: string;
@@ -72,6 +93,15 @@ export const TodoToolbar = ({
   onSortChange,
   onOrderChange,
 }: TodoToolbarProps) => {
+  const completionOptions = COMPLETION_ITEMS.filter(
+    (item) => item.value !== completion
+  );
+  const priorityOptions = PRIORITY_FILTER_ITEMS.filter(
+    (item) => item.value !== priority
+  );
+  const sortOptions = SORT_ITEMS.filter((item) => item.value !== sort);
+  const orderOptions = ORDER_ITEMS.filter((item) => item.value !== order);
+
   return (
     <section
       aria-label="할 일 검색 및 필터"
@@ -100,7 +130,7 @@ export const TodoToolbar = ({
           </Label>
           <Select
             value={completion}
-            items={COMPLETION_ITEMS}
+            items={COMPLETION_LABELS}
             onValueChange={(value) => {
               if (value == null) return;
               onCompletionChange(value as CompletionFilter);
@@ -108,18 +138,22 @@ export const TodoToolbar = ({
           >
             <SelectTrigger
               id="todo-completion-filter"
-              className="h-9 w-full text-sm"
+              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent
+              side="bottom"
+              sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+              className={MENU_CONTENT_CLASS}
             >
-              <SelectItem value="all">전체</SelectItem>
-              <SelectItem value="incomplete">미완료</SelectItem>
-              <SelectItem value="completed">완료</SelectItem>
+              {completionOptions.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -130,7 +164,7 @@ export const TodoToolbar = ({
           </Label>
           <Select
             value={priority}
-            items={PRIORITY_FILTER_ITEMS}
+            items={PRIORITY_FILTER_LABELS}
             onValueChange={(value) => {
               if (value == null) return;
               onPriorityChange(value as TodoPriority | "all");
@@ -138,19 +172,20 @@ export const TodoToolbar = ({
           >
             <SelectTrigger
               id="todo-priority-filter"
-              className="h-9 w-full text-sm"
+              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent
+              side="bottom"
+              sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+              className={MENU_CONTENT_CLASS}
             >
-              <SelectItem value="all">전체</SelectItem>
-              {TODO_PRIORITIES.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {PRIORITY_LABELS[item]}
+              {priorityOptions.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -163,24 +198,30 @@ export const TodoToolbar = ({
           </Label>
           <Select
             value={sort}
-            items={SORT_ITEMS}
+            items={SORT_LABELS}
             onValueChange={(value) => {
               if (value == null) return;
               onSortChange(value as TodoSortKey);
             }}
           >
-            <SelectTrigger id="todo-sort" className="h-9 w-full text-sm">
+            <SelectTrigger
+              id="todo-sort"
+              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent
+              side="bottom"
+              sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+              className={MENU_CONTENT_CLASS}
             >
-              <SelectItem value="created_at">생성일</SelectItem>
-              <SelectItem value="due_date">마감일</SelectItem>
-              <SelectItem value="priority">우선순위</SelectItem>
-              <SelectItem value="title">제목</SelectItem>
+              {sortOptions.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -191,22 +232,30 @@ export const TodoToolbar = ({
           </Label>
           <Select
             value={order}
-            items={ORDER_ITEMS}
+            items={ORDER_LABELS}
             onValueChange={(value) => {
               if (value == null) return;
               onOrderChange(value as TodoSortOrder);
             }}
           >
-            <SelectTrigger id="todo-order" className="h-9 w-full text-sm">
+            <SelectTrigger
+              id="todo-order"
+              className="h-9 w-full text-sm data-popup-open:rounded-b-none"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent
+              side="bottom"
+              sideOffset={0}
               align="start"
               alignItemWithTrigger={false}
-              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+              className={MENU_CONTENT_CLASS}
             >
-              <SelectItem value="asc">오름차순</SelectItem>
-              <SelectItem value="desc">내림차순</SelectItem>
+              {orderOptions.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
