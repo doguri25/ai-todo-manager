@@ -62,15 +62,21 @@ const ORDER_LABELS = Object.fromEntries(
   ORDER_ITEMS.map((item) => [item.value, item.label])
 ) as Record<TodoSortOrder, string>;
 
-/** 필터 버튼 — 열렸을 때 메뉴와 같은 톤으로 이어지게 */
+/** 필터 버튼 — 선택값은 primary, 글자는 메뉴와 같은 가운데 정렬 */
 const FILTER_TRIGGER_CLASS =
-  "h-9 w-full border border-border/55 bg-input/55 text-sm text-foreground shadow-none " +
+  "relative h-9 w-full justify-center gap-0 border border-border/55 bg-input/55 " +
+  "px-2 pr-7 text-sm shadow-none " +
   "hover:bg-input/70 focus-visible:border-border/55 focus-visible:ring-0 " +
   "data-popup-open:rounded-b-none data-popup-open:border-border/55 " +
   "data-popup-open:border-b-transparent data-popup-open:bg-input/55 " +
-  "data-popup-open:shadow-none data-popup-open:ring-0";
+  "data-popup-open:shadow-none data-popup-open:ring-0 " +
+  "*:data-[slot=select-value]:flex-none *:data-[slot=select-value]:justify-center " +
+  "*:data-[slot=select-value]:text-center *:data-[slot=select-value]:font-semibold " +
+  "*:data-[slot=select-value]:text-primary " +
+  "[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:right-2 [&_svg]:size-3.5 " +
+  "[&_svg]:-translate-y-1/2 [&_svg]:text-muted-foreground";
 
-/** 필터 메뉴 — 버튼 배경·테두리를 그대로 이어받음 */
+/** 필터 메뉴 — 버튼과 같은 가운데 정렬·패딩 */
 const FILTER_MENU_CLASS =
   "min-w-0 w-(--anchor-width) max-w-(--anchor-width) rounded-t-none rounded-b-3xl " +
   "border border-t-0 border-border/55 bg-input/55 p-1 text-popover-foreground " +
@@ -78,9 +84,12 @@ const FILTER_MENU_CLASS =
   "data-open:animate-none data-closed:animate-none";
 
 const FILTER_ITEM_CLASS =
-  "rounded-2xl py-1.5 pr-3 text-foreground " +
+  "justify-center gap-0 rounded-2xl px-2 py-1.5 pr-2 pl-2 text-sm font-medium " +
+  "text-foreground " +
   "focus:bg-background/75 focus:text-foreground " +
-  "data-highlighted:bg-background/75 data-highlighted:text-foreground";
+  "data-highlighted:bg-background/75 data-highlighted:text-foreground " +
+  "[&>[data-slot]]:justify-center [&>span]:flex-none [&>span]:justify-center " +
+  "[&>span]:text-center";
 
 type TodoToolbarProps = {
   query: string;
