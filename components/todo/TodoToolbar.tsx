@@ -112,7 +112,11 @@ export const TodoToolbar = ({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+            >
               <SelectItem value="all">전체</SelectItem>
               <SelectItem value="incomplete">미완료</SelectItem>
               <SelectItem value="completed">완료</SelectItem>
@@ -138,7 +142,11 @@ export const TodoToolbar = ({
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+            >
               <SelectItem value="all">전체</SelectItem>
               {TODO_PRIORITIES.map((item) => (
                 <SelectItem key={item} value={item}>
@@ -164,7 +172,11 @@ export const TodoToolbar = ({
             <SelectTrigger id="todo-sort" className="h-9 w-full text-sm">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+            >
               <SelectItem value="created_at">생성일</SelectItem>
               <SelectItem value="due_date">마감일</SelectItem>
               <SelectItem value="priority">우선순위</SelectItem>
@@ -188,7 +200,11 @@ export const TodoToolbar = ({
             <SelectTrigger id="todo-order" className="h-9 w-full text-sm">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              align="start"
+              alignItemWithTrigger={false}
+              className="min-w-0 w-(--anchor-width) max-w-(--anchor-width)"
+            >
               <SelectItem value="asc">오름차순</SelectItem>
               <SelectItem value="desc">내림차순</SelectItem>
             </SelectContent>
