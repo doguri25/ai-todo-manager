@@ -20,13 +20,16 @@ import {
 type HeaderClockWeatherProps = {
   /** 일정이 있는 날짜(로컬 자정 Date) */
   scheduledDates?: Date[];
+  /** 모바일용 압축 레이아웃 */
+  compact?: boolean;
 };
 
 /**
- * 헤더 중앙용 날씨(아이콘)·날짜·시간을 고정 높이로 가로 배치한다.
+ * 헤더용 날씨·날짜·시간을 가로 배치한다.
  */
 export const HeaderClockWeather = ({
   scheduledDates = [],
+  compact = false,
 }: HeaderClockWeatherProps) => {
   const [now, setNow] = useState<Date | null>(null);
   const [weather, setWeather] = useState<WeatherBundle | null>(null);
@@ -90,40 +93,62 @@ export const HeaderClockWeather = ({
   const dateLabel = now
     ? new Intl.DateTimeFormat("ko-KR", {
         timeZone: "Asia/Seoul",
-        month: "long",
+        month: compact ? "numeric" : "long",
         day: "numeric",
         weekday: "short",
       }).format(now)
     : "날짜…";
 
   const timeLabel = now
-    ? new Intl.DateTimeFormat("ko-KR", {
-        timeZone: "Asia/Seoul",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      }).format(now)
-    : "--:--:--";
+    ? new Intl.DateTimeFormat(
+        "ko-KR",
+        compact
+          ? {
+              timeZone: "Asia/Seoul",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }
+          : {
+              timeZone: "Asia/Seoul",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            }
+      ).format(now)
+    : compact
+      ? "--:--"
+      : "--:--:--";
 
   const nextHour = weather?.laterHours[0] ?? null;
 
   return (
-    <div className="flex h-10 min-w-0 items-center justify-center gap-1.5">
+    <div
+      className={
+        compact
+          ? "flex h-9 w-full min-w-0 items-center gap-1.5"
+          : "flex h-10 min-w-0 items-center justify-center gap-1.5"
+      }
+    >
       <Popover open={weatherOpen} onOpenChange={setWeatherOpen}>
         <PopoverTrigger
           render={
             <button
               type="button"
-              className="flex h-10 w-[13.75rem] shrink-0 items-center justify-center gap-1 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-3 py-0 transition-colors hover:bg-muted/50 sm:w-[14.5rem]"
+              className={
+                compact
+                  ? "flex h-9 min-w-0 flex-1 items-center justify-center gap-1 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-2 py-0 transition-colors hover:bg-muted/50"
+                  : "flex h-10 w-[13.75rem] shrink-0 items-center justify-center gap-1 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 px-3 py-0 transition-colors hover:bg-muted/50 sm:w-[14.5rem]"
+              }
               aria-label="주간 날씨 보기"
             />
           }
         >
           {weatherError || !weather ? (
             <>
-              <WeatherGlyph code={3} className="size-6" />
-              <span className="whitespace-nowrap text-xs text-muted-foreground">
+              <WeatherGlyph code={3} className={compact ? "size-5" : "size-6"} />
+              <span className="truncate text-xs text-muted-foreground">
                 {weatherError ? "날씨 없음" : "불러오는 중…"}
               </span>
             </>
@@ -131,14 +156,18 @@ export const HeaderClockWeather = ({
             <>
               <WeatherGlyph
                 code={weather.current.weatherCode}
-                className="size-6 shrink-0"
+                className={compact ? "size-5 shrink-0" : "size-6 shrink-0"}
               />
               <span className="flex min-w-0 items-center justify-center gap-1 text-xs font-medium">
-                <MapPinIcon className="size-3 shrink-0" aria-hidden />
-                <span className="max-w-[3.75rem] truncate sm:max-w-[4.5rem]">
-                  {weather.location}
-                </span>
-                <span className="w-7 shrink-0 text-center tabular-nums">
+                {!compact ? (
+                  <>
+                    <MapPinIcon className="size-3 shrink-0" aria-hidden />
+                    <span className="max-w-[3.75rem] truncate sm:max-w-[4.5rem]">
+                      {weather.location}
+                    </span>
+                  </>
+                ) : null}
+                <span className="shrink-0 tabular-nums">
                   {weather.current.temperature}°
                 </span>
                 {nextHour ? (
@@ -151,7 +180,7 @@ export const HeaderClockWeather = ({
                       className="size-5 shrink-0"
                       iconClassName="size-3"
                     />
-                    <span className="w-7 shrink-0 text-center tabular-nums text-muted-foreground">
+                    <span className="shrink-0 tabular-nums text-muted-foreground">
                       {nextHour.temperature}°
                     </span>
                   </>
@@ -204,18 +233,22 @@ export const HeaderClockWeather = ({
               type="button"
               variant="outline"
               size="sm"
-              className="h-10 w-[15.25rem] shrink-0 justify-center gap-1.5 overflow-hidden rounded-2xl px-3 sm:w-[16rem]"
+              className={
+                compact
+                  ? "h-9 min-w-0 flex-1 justify-center gap-1 overflow-hidden rounded-2xl px-2"
+                  : "h-10 w-[15.25rem] shrink-0 justify-center gap-1.5 overflow-hidden rounded-2xl px-3 sm:w-[16rem]"
+              }
               aria-label="일정 달력 열기"
             />
           }
         >
           <CalendarDaysIcon className="size-3.5 shrink-0 text-brand-ai" />
-          <span className="flex items-center justify-center gap-1 whitespace-nowrap text-xs font-medium">
-            <span className="min-w-[5.75rem] text-center">{dateLabel}</span>
+          <span className="flex min-w-0 items-center justify-center gap-1 truncate text-xs font-medium">
+            <span className="truncate">{dateLabel}</span>
             <span className="text-muted-foreground" aria-hidden>
               -
             </span>
-            <span className="w-[4.75rem] text-center tabular-nums text-muted-foreground">
+            <span className="shrink-0 tabular-nums text-muted-foreground">
               {timeLabel}
             </span>
           </span>

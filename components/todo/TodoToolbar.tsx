@@ -65,7 +65,7 @@ const ORDER_LABELS = Object.fromEntries(
 /** 필터 버튼 — 글자는 왼쪽 정렬, 열렸을 때만 primary */
 const FILTER_TRIGGER_CLASS =
   "relative h-9 w-full justify-start gap-0 border border-border/55 bg-input/55 " +
-  "py-0 pl-2.5 pr-7 text-sm font-medium text-foreground shadow-none " +
+  "py-0 pl-1.5 pr-5 text-[11px] font-medium text-foreground shadow-none sm:pl-2.5 sm:pr-7 sm:text-sm " +
   "hover:bg-input/70 focus-visible:border-border/55 focus-visible:ring-0 " +
   "data-popup-open:rounded-b-none data-popup-open:border-border/55 " +
   "data-popup-open:border-b-transparent data-popup-open:bg-input/55 " +
@@ -75,8 +75,8 @@ const FILTER_TRIGGER_CLASS =
   "*:data-[slot=select-value]:text-foreground " +
   "data-popup-open:*:data-[slot=select-value]:font-semibold " +
   "data-popup-open:*:data-[slot=select-value]:text-primary " +
-  "[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:right-2 [&_svg]:size-3.5 " +
-  "[&_svg]:-translate-y-1/2 [&_svg]:text-muted-foreground";
+  "[&_svg]:absolute [&_svg]:top-1/2 [&_svg]:right-1 [&_svg]:size-3 " +
+  "[&_svg]:-translate-y-1/2 [&_svg]:text-muted-foreground sm:[&_svg]:right-2 sm:[&_svg]:size-3.5";
 
 /** 필터 메뉴 — 버튼과 같은 왼쪽 패딩으로 글자 세로(가로 위치) 정렬 */
 const FILTER_MENU_CLASS =
@@ -87,8 +87,8 @@ const FILTER_MENU_CLASS =
   "**:data-[slot=select-item]:scroll-my-0";
 
 const FILTER_ITEM_CLASS =
-  "min-h-9 w-full justify-start gap-0 rounded-none px-0 py-0 pl-2.5 pr-2.5 " +
-  "text-sm font-medium text-foreground " +
+  "min-h-9 w-full justify-start gap-0 rounded-none px-0 py-0 pl-1.5 pr-1.5 " +
+  "text-[11px] font-medium text-foreground sm:pl-2.5 sm:pr-2.5 sm:text-sm " +
   "focus:bg-background/75 focus:text-foreground " +
   "data-highlighted:bg-background/75 data-highlighted:text-foreground " +
   "first:rounded-none last:rounded-b-3xl " +
@@ -137,8 +137,8 @@ export const TodoToolbar = ({
       aria-label="할 일 검색 및 필터"
       className="rounded-4xl border border-border/80 bg-card p-3 shadow-sm"
     >
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="flex min-w-[8rem] flex-[1_1_8rem] max-w-[12rem] flex-col gap-1.5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
+        <div className="flex w-full flex-col gap-1.5 sm:min-w-[8rem] sm:max-w-[12rem] sm:flex-[1_1_8rem]">
           <Label htmlFor="todo-search" className="text-xs">
             검색
           </Label>
@@ -154,150 +154,161 @@ export const TodoToolbar = ({
           </div>
         </div>
 
-        <div className="flex w-[5.75rem] shrink-0 flex-col gap-1.5">
-          <Label htmlFor="todo-completion-filter" className="text-xs">
-            상태
-          </Label>
-          <Select
-            value={completion}
-            items={COMPLETION_LABELS}
-            onValueChange={(value) => {
-              if (value == null) return;
-              onCompletionChange(value as CompletionFilter);
-            }}
-          >
-            <SelectTrigger
-              id="todo-completion-filter"
-              className={FILTER_TRIGGER_CLASS}
+        <div className="grid grid-cols-4 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
+          <div className="flex min-w-0 flex-col gap-1 sm:w-[5.75rem] sm:shrink-0 sm:gap-1.5">
+            <Label
+              htmlFor="todo-completion-filter"
+              className="truncate text-[10px] sm:text-xs"
             >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent
-              side="bottom"
-              sideOffset={0}
-              align="start"
-              alignItemWithTrigger={false}
-              className={FILTER_MENU_CLASS}
+              상태
+            </Label>
+            <Select
+              value={completion}
+              items={COMPLETION_LABELS}
+              onValueChange={(value) => {
+                if (value == null) return;
+                onCompletionChange(value as CompletionFilter);
+              }}
             >
-              {completionOptions.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                  className={FILTER_ITEM_CLASS}
-                >
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              <SelectTrigger
+                id="todo-completion-filter"
+                className={FILTER_TRIGGER_CLASS}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                side="bottom"
+                sideOffset={0}
+                align="start"
+                alignItemWithTrigger={false}
+                className={FILTER_MENU_CLASS}
+              >
+                {completionOptions.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className={FILTER_ITEM_CLASS}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex w-[5.75rem] shrink-0 flex-col gap-1.5">
-          <Label htmlFor="todo-priority-filter" className="text-xs">
-            우선순위
-          </Label>
-          <Select
-            value={priority}
-            items={PRIORITY_FILTER_LABELS}
-            onValueChange={(value) => {
-              if (value == null) return;
-              onPriorityChange(value as TodoPriority | "all");
-            }}
-          >
-            <SelectTrigger
-              id="todo-priority-filter"
-              className={FILTER_TRIGGER_CLASS}
+          <div className="flex min-w-0 flex-col gap-1 sm:w-[5.75rem] sm:shrink-0 sm:gap-1.5">
+            <Label
+              htmlFor="todo-priority-filter"
+              className="truncate text-[10px] sm:text-xs"
             >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent
-              side="bottom"
-              sideOffset={0}
-              align="start"
-              alignItemWithTrigger={false}
-              className={FILTER_MENU_CLASS}
+              우선순위
+            </Label>
+            <Select
+              value={priority}
+              items={PRIORITY_FILTER_LABELS}
+              onValueChange={(value) => {
+                if (value == null) return;
+                onPriorityChange(value as TodoPriority | "all");
+              }}
             >
-              {priorityOptions.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                  className={FILTER_ITEM_CLASS}
-                >
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              <SelectTrigger
+                id="todo-priority-filter"
+                className={FILTER_TRIGGER_CLASS}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                side="bottom"
+                sideOffset={0}
+                align="start"
+                alignItemWithTrigger={false}
+                className={FILTER_MENU_CLASS}
+              >
+                {priorityOptions.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className={FILTER_ITEM_CLASS}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex w-[6.5rem] shrink-0 flex-col gap-1.5">
-          <Label htmlFor="todo-sort" className="text-xs">
-            정렬
-          </Label>
-          <Select
-            value={sort}
-            items={SORT_LABELS}
-            onValueChange={(value) => {
-              if (value == null) return;
-              onSortChange(value as TodoSortKey);
-            }}
-          >
-            <SelectTrigger id="todo-sort" className={FILTER_TRIGGER_CLASS}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent
-              side="bottom"
-              sideOffset={0}
-              align="start"
-              alignItemWithTrigger={false}
-              className={FILTER_MENU_CLASS}
+          <div className="flex min-w-0 flex-col gap-1 sm:w-[6.5rem] sm:shrink-0 sm:gap-1.5">
+            <Label htmlFor="todo-sort" className="truncate text-[10px] sm:text-xs">
+              정렬
+            </Label>
+            <Select
+              value={sort}
+              items={SORT_LABELS}
+              onValueChange={(value) => {
+                if (value == null) return;
+                onSortChange(value as TodoSortKey);
+              }}
             >
-              {sortOptions.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                  className={FILTER_ITEM_CLASS}
-                >
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+              <SelectTrigger id="todo-sort" className={FILTER_TRIGGER_CLASS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                side="bottom"
+                sideOffset={0}
+                align="start"
+                alignItemWithTrigger={false}
+                className={FILTER_MENU_CLASS}
+              >
+                {sortOptions.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className={FILTER_ITEM_CLASS}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex w-[6.5rem] shrink-0 flex-col gap-1.5">
-          <Label htmlFor="todo-order" className="text-xs">
-            순서
-          </Label>
-          <Select
-            value={order}
-            items={ORDER_LABELS}
-            onValueChange={(value) => {
-              if (value == null) return;
-              onOrderChange(value as TodoSortOrder);
-            }}
-          >
-            <SelectTrigger id="todo-order" className={FILTER_TRIGGER_CLASS}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent
-              side="bottom"
-              sideOffset={0}
-              align="start"
-              alignItemWithTrigger={false}
-              className={FILTER_MENU_CLASS}
+          <div className="flex min-w-0 flex-col gap-1 sm:w-[6.5rem] sm:shrink-0 sm:gap-1.5">
+            <Label
+              htmlFor="todo-order"
+              className="truncate text-[10px] sm:text-xs"
             >
-              {orderOptions.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                  className={FILTER_ITEM_CLASS}
-                >
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              순서
+            </Label>
+            <Select
+              value={order}
+              items={ORDER_LABELS}
+              onValueChange={(value) => {
+                if (value == null) return;
+                onOrderChange(value as TodoSortOrder);
+              }}
+            >
+              <SelectTrigger id="todo-order" className={FILTER_TRIGGER_CLASS}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                side="bottom"
+                sideOffset={0}
+                align="start"
+                alignItemWithTrigger={false}
+                className={FILTER_MENU_CLASS}
+              >
+                {orderOptions.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className={FILTER_ITEM_CLASS}
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
     </section>

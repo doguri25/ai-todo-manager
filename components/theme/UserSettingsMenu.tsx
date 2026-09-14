@@ -170,7 +170,7 @@ export const UserSettingsMenu = ({
           />
         }
       >
-        <span className="min-w-0 truncate text-sm font-medium">
+        <span className="hidden min-w-0 truncate text-sm font-medium sm:inline">
           {displayName}
         </span>
         <Avatar size="default" className="shrink-0">

@@ -1,5 +1,5 @@
 /** 앱 공개 버전 — package.json과 동기화한다. */
-export const APP_VERSION = "1.1.2";
+export const APP_VERSION = "1.1.3";
 
 export const APP_INFO = {
   name: "도구리 태스크",
